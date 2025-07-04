@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div>  <p style="visibility: hidden;">.</p>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="movie-card">
+                    <div class="position-relative">
+                        <img src="{{ article.get_photo }}" alt="{{ article.title }}" class="w-100"
+                             style="height: 600px; object-fit: cover;">
+                        {% if article.rating %}
+                        <div class="movie-rating" style="font-size: 1.2rem; padding: 0.5rem 1rem;">
+                            <i class="fas fa-star me-1"></i>{{ article.rating }}/10
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="movie-card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h1 class="movie-title mb-0">{{ article.title }}</h1>
+                            {% if user.is_authenticated %}
+                            <div class="dropdown">
+                                <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown">
+                                    <i class="fas fa-cog"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-dark">
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'update' article.id %}">
+                                            <i class="fas fa-edit me-2"></i>Sozlash
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="{% url 'delete' article.id %}">
+                                            <i class="fas fa-trash me-2"></i>O'chirish
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <a href="{% url 'category' article.category.id %}" class="category-badge me-3">
+                                <i class="fas fa-tag me-1"></i>{{ article.category.title }}
+                            </a>
+                            <span class="text-muted">
+                            <i class="fas fa-eye me-1"></i>{{ article.views }} Prasmotr
+                        </span>
+                            <span class="text-muted ms-3">
+                            <i class="fas fa-calendar me-1"></i>{{ article.created_at|date:"F d, Y" }}
+                        </span>
+                        </div>
+
+                        <div class="movie-content">
+                            <h3 style="color: var(--primary-color); margin-bottom: 1rem;">
+                                <i class="fas fa-info-circle me-2"></i>Bu Film haqida
+                            </h3>
+                            <p style="line-height: 1.8; font-size: 1.1rem;">{{ article.content|linebreaks }}</p>
+                        </div>
+
+                        {% if article.video %}
+                        <div class="mt-4">
+                            <h3 style="color: var(--primary-color); margin-bottom: 1rem;">
+                                <i class="fas fa-play-circle me-2"></i>Treyler tomosha qilish
+                            </h3>
+                            <div class="ratio ratio-16x9">
+                                <iframe src="{{ article.video }}" allowfullscreen class="rounded"></iframe>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="movie-card p-4 mb-4">
+                    <h4 style="color: var(--primary-color); margin-bottom: 1rem;">
+                        <i class="fas fa-film me-2"></i>Film tafsilotlari
+                    </h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <strong>Category:</strong>
+                            <a href="{% url 'category' article.category.id %}" class="text-decoration-none"
+                               style="color: var(--accent-color);">
+                                {{ article.category.title }}
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <strong>Rating:</strong>
+                            {% if article.rating %}
+                            <span style="color: var(--accent-color);">
+                                <i class="fas fa-star"></i> {{ article.rating }}/10
+                            </span>
+                            {% else %}
+                            <span class="text-muted">Baholanmagan</span>
+                            {% endif %}
+                        </li>
+                        <li class="mb-2">
+                            <strong>Views:</strong>
+                            <span style="color: var(--accent-color);">{{ article.views }}</span>
+                        </li>
+                        <li class="mb-2">
+                            <strong>Added:</strong>
+                            <span class="text-muted">{{ article.created_at|date:"F d, Y" }}</span>
+                        </li>
+                        {% if article.updated_at != article.created_at %}
+                        <li class="mb-2">
+                            <strong>Updated:</strong>
+                            <span class="text-muted">{{ article.updated_at|date:"F d, Y" }}</span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                {% if related_articles %}
+                <div class="movie-card p-4">
+                    <h4 style="color: var(--primary-color); margin-bottom: 1rem;">
+                        <i class="fas fa-thumbs-up me-2"></i>Sizga ham yoqishi mumkin
+                    </h4>
+                    {% for related in related_articles %}
+                    <div class="d-flex mb-3 p-2 rounded" style="background: rgba(255, 255, 255, 0.05);">
+                        <img src="{{ related.get_photo }}" alt="{{ related.title }}"
+                             style="width: 60px; height: 80px; object-fit: cover; border-radius: 5px;">
+                        <div class="ms-3 flex-grow-1">
+                            <a href="{% url 'article' related.id %}" class="text-decoration-none">
+                                <h6 class="movie-title mb-1" style="font-size: 0.9rem;">{{ related.title }}</h6>
+                            </a>
+                            {% if related.rating %}
+                            <small style="color: var(--accent-color);">
+                                <i class="fas fa-star"></i> {{ related.rating }}
+                            </small>
+                            {% endif %}
+                            <small class="text-muted d-block">
+                                <i class="fas fa-eye"></i> {{ related.views }} views
+                            </small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="movie-card p-4">
+                <h2 class="text-center mb-4" style="color: var(--primary-color);">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    {% if article %}Edit Movie{% else %}Yangi film qo'shish{% endif %}
+                </h2>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">
+                                <i class="fas fa-film me-1"></i>Film nomi
+                            </label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                            <div class="text-danger mt-1">
+                                {% for error in form.title.errors %}
+                                <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6 mgb-3">
+                            <label for="{{ form.category.id_for_label }}" class="form-label">
+                                <i class="fas fa-tag me-1"></i>Category
+                            </label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                            <div class="text-danger mt-1" style="color: #28a745">
+                                {% for error in form.category.errors %}
+                                <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.rating.id_for_label }}" class="form-label">
+                                <i class="fas fa-star me-1"></i>Reyting (1-10)
+                            </label>
+                            {{ form.rating }}
+                            {% if form.rating.errors %}
+                            <div class="text-danger mt-1">
+                                {% for error in form.rating.errors %}
+                                <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.photo.id_for_label }}" class="form-label">
+                                <i class="fas fa-image me-1"></i>Kino afishasi
+                            </label>
+                            {{ form.photo }}
+                            {% if form.photo.errors %}
+                            <div class="text-danger mt-1">
+                                {% for error in form.photo.errors %}
+                                <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {% if form.video.value %}
+                        <iframe width="100%" height="400" src="{{ form.video.value }}"
+                                title="Video Preview" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowfullscreen></iframe>
+                        {% endif %}
+
+                        <label for="{{ form.video.id_for_label }}" class="form-label">
+                            <i class="fas fa-video me-1"></i> Trailer URL (YouTube/Vimeo)
+                        </label>
+                        {{ form.video }}
+
+                        {% if form.video.errors %}
+                        <div class="text-danger mt-1">
+                            {% for error in form.video.errors %}
+                            <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Paste the embed URL (e.g., https://www.youtube.com/embed/VIDEO_ID)
+                        </small>
+                    </div>
+
+
+                    <div class="mb-4">
+                        <label for="{{ form.content.id_for_label }}" class="form-label">
+                            <i class="fas fa-align-left me-1"></i>Film tavsifi
+                        </label>
+                        {{ form.content }}
+                        {% if form.content.errors %}
+                        <div class="text-danger mt-1">
+                            {% for error in form.content.errors %}
+                            <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-save me-2"></i>
+                            {% if article %}Filmni yangilash{% else %}Add Movie{% endif %}
+                        </button>
+                        <a href="{% url 'index' %}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-times me-2"></i>Bekor qilish
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Preview image before upload
+    document.getElementById('{{ form.photo.id_for_label }}').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                // Create preview if doesn't exist
+                let preview = document.getElementById('image-preview');
+                if (!preview) {
+                    preview = document.createElement('img');
+                    preview.id = 'image-preview';
+                    preview.style.cssText = 'max-width: 200px; max-height: 200px; margin-top: 10px; border-radius: 10px;';
+                    e.target.parentNode.appendChild(preview);
+                }
+                preview.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+{% endblock %}
